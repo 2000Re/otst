@@ -1,0 +1,35 @@
+name: Publish essays to Hatena Blog
+
+on:
+  push:
+    branches: [main]
+    paths: ["essays/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish
+        env:
+          HATENA_ID: ${{ secrets.HATENA_ID }}
+          HATENA_BLOG_ID: ${{ secrets.HATENA_BLOG_ID }}
+          HATENA_API_KEY: ${{ secrets.HATENA_API_KEY }}
+        run: python3 scripts/publish_hatena.py
+      - name: Record published files
+        run: |
+          if [ -n "$(git status --porcelain published.txt)" ]; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@users.noreply.github.com"
+            git add published.txt
+            git commit -m "Record published essays"
+            git push
+          fi
