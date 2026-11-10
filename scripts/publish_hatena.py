@@ -4,7 +4,7 @@
 環境変数: HATENA_ID, HATENA_BLOG_ID, HATENA_API_KEY
 オプション: --dry-run  (送信せずXMLだけ表示)
 """
-import base64, glob, os, sys, urllib.request, urllib.error
+import base64, glob, html, os, re, sys, urllib.request, urllib.error
 from datetime import datetime, timezone
 from xml.sax.saxutils import escape
 
@@ -27,13 +27,23 @@ def parse(path):
     return lines[0][2:].strip(), "\n".join(lines[1:]).strip()
 
 
+def to_html(body):
+    """空行=段落、行末の改行=<br> に変換（表示の記法設定に依存しないようHTMLで送る）"""
+    paras = [p for p in re.split(r"\n\s*\n", body.strip()) if p.strip()]
+    out = []
+    for para in paras:
+        lines = [html.escape(l.strip()) for l in para.splitlines() if l.strip()]
+        out.append("<p>" + "<br />\n".join(lines) + "</p>")
+    return "\n\n".join(out)
+
+
 def build_xml(title, body):
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     return f"""<?xml version="1.0" encoding="utf-8"?>
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app">
   <title>{escape(title)}</title>
   <author><name>{escape(os.environ.get('HATENA_ID', ''))}</name></author>
-  <content type="text/x-markdown">{escape(body)}</content>
+  <content type="text/html">{escape(to_html(body))}</content>
   <updated>{now}</updated>
   <app:control><app:draft>no</app:draft></app:control>
 </entry>
