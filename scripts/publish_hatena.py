@@ -41,7 +41,7 @@ def build_xml(title, body):
 
 
 def post(xml):
-    hid, blog, key = (os.environ[k] for k in ("HATENA_ID", "HATENA_BLOG_ID", "HATENA_API_KEY"))
+    hid, blog, key = (os.environ[k].strip() for k in ("HATENA_ID", "HATENA_BLOG_ID", "HATENA_API_KEY"))
     url = f"https://blog.hatena.ne.jp/{hid}/{blog}/atom/entry"
     token = base64.b64encode(f"{hid}:{key}".encode()).decode()
     req = urllib.request.Request(
@@ -71,6 +71,10 @@ def main():
             status = post(xml)
         except urllib.error.HTTPError as e:
             print(f"失敗 {name}: HTTP {e.code}", file=sys.stderr)
+            if e.code == 401:
+                print("401: はてなID または AtomPub のAPIキー（設定→詳細設定→AtomPub）を確認してください", file=sys.stderr)
+            elif e.code == 404:
+                print("404: HATENA_BLOG_ID（例: otst.hatenablog.jp）を確認してください", file=sys.stderr)
             sys.exit(1)
         print(f"公開 {name}: HTTP {status} 「{title}」")
         with open(PUBLISHED, "a", encoding="utf-8") as f:
