@@ -37,13 +37,27 @@ def to_html(body):
     return "\n\n".join(out)
 
 
+BANNER = "[blog:g:6653812171403971647:banner]"  # 記事の末尾に自動で付けるバナー記法
+
+
+def to_markdown(body):
+    """空行=段落、行末の改行=Markdownの強制改行(末尾スペース2つ)。末尾にバナー記法を付ける"""
+    paras = [p for p in re.split(r"\n\s*\n", body.strip()) if p.strip()]
+    out = []
+    for para in paras:
+        lines = [re.sub(r"([\\`*_{}#>])", r"\\\1", l.strip()) for l in para.splitlines() if l.strip()]
+        out.append("  \n".join(lines))
+    out.append(BANNER)
+    return "\n\n".join(out)
+
+
 def build_xml(title, body):
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     return f"""<?xml version="1.0" encoding="utf-8"?>
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app">
   <title>{escape(title)}</title>
   <author><name>{escape(os.environ.get('HATENA_ID', ''))}</name></author>
-  <content type="text/html">{escape(to_html(body))}</content>
+  <content type="text/x-markdown">{escape(to_markdown(body))}</content>
   <updated>{now}</updated>
   <app:control><app:draft>no</app:draft></app:control>
 </entry>
