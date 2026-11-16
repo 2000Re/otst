@@ -53,7 +53,7 @@ def build_xml(title, body):
   <author><name>{escape(os.environ.get('HATENA_ID', ''))}</name></author>
   <content type="text/x-markdown">{escape(to_markdown(body))}</content>
   <updated>{now}</updated>
-  <app:control><app:draft>no</app:draft></app:control>
+  <app:control><app:draft>yes</app:draft></app:control>
 </entry>
 """
 
