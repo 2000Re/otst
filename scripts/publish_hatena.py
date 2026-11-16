@@ -41,14 +41,8 @@ BANNER = "[blog:g:6653812171403971647:banner]"  # 記事の末尾に自動で付
 
 
 def to_markdown(body):
-    """空行=段落、行末の改行=Markdownの強制改行(末尾スペース2つ)。末尾にバナー記法を付ける"""
-    paras = [p for p in re.split(r"\n\s*\n", body.strip()) if p.strip()]
-    out = []
-    for para in paras:
-        lines = [re.sub(r"([\\`*_{}#>])", r"\\\1", l.strip()) for l in para.splitlines() if l.strip()]
-        out.append("  \n".join(lines))
-    out.append(BANNER)
-    return "\n\n".join(out)
+    """本文はHTML(<p>/<br />)のまま、末尾にバナー記法を1段落で付ける（Markdownモードで両方が効く）"""
+    return to_html(body) + "\n\n" + BANNER
 
 
 def build_xml(title, body):
