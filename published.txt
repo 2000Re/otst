@@ -9,3 +9,4 @@ essay_2026-11-17.md
 essay_2026-11-18.md
 essay_2026-11-19.md
 essay_2026-11-20.md
+essay_2026-11-21.md
