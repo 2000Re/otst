@@ -14,3 +14,4 @@ essay_2026-11-22.md
 essay_2026-11-23.md
 essay_2026-11-24.md
 essay_2026-11-25.md
+essay_2026-11-25_2.md
