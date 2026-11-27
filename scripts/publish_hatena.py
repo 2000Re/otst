@@ -4,8 +4,8 @@
 環境変数: HATENA_ID, HATENA_BLOG_ID, HATENA_API_KEY
 オプション: --dry-run  (送信せずXMLだけ表示)
 """
-import base64, glob, html, os, re, sys, urllib.request, urllib.error
-from datetime import datetime, timezone
+import base64, glob, html, os, random, re, sys, urllib.request, urllib.error
+from datetime import datetime, timedelta, timezone
 from xml.sax.saxutils import escape
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,14 +45,23 @@ def to_markdown(body):
     return to_html(body) + "\n\n" + BANNER
 
 
+JST = timezone(timedelta(hours=9))
+
+
+def random_post_time():
+    """実行日(日本時間)の 18:00:00〜19:59:59 からランダムに選んだ投稿時刻"""
+    start = datetime.now(JST).replace(hour=18, minute=0, second=0, microsecond=0)
+    return (start + timedelta(seconds=random.randrange(2 * 60 * 60))).isoformat()
+
+
 def build_xml(title, body):
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    posted = random_post_time()
     return f"""<?xml version="1.0" encoding="utf-8"?>
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app">
   <title>{escape(title)}</title>
   <author><name>{escape(os.environ.get('HATENA_ID', ''))}</name></author>
   <content type="text/x-markdown">{escape(to_markdown(body))}</content>
-  <updated>{now}</updated>
+  <updated>{posted}</updated>
   <app:control><app:draft>yes</app:draft></app:control>
 </entry>
 """
