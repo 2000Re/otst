@@ -17,3 +17,4 @@ essay_2026-11-25.md
 essay_2026-11-25_2.md
 essay_2026-11-26.md
 essay_2026-11-27.md
+essay_2026-11-28.md
